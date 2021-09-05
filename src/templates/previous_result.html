@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Deployable Secrets Scanner</title>
+<link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='/assets/css/fontawesome.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/templatemo.css') }}">
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+</head>
+
+<body>
+	<!-- Header -->
+	<nav class="navbar navbar-expand-lg navbar-light shadow">
+		<div class="container d-flex justify-content-between align-items-center">
+
+			<a class="navbar-brand text-success logo h1 align-self-center" href="index.html">
+			   
+		<img src="{{url_for('static', filename='assets/img/kpmg_logo.jpg')}}"  />
+			</a>
+
+			<button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
+				<div class="flex-fill">
+					<ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
+						<li class="nav-item">
+							<a class="nav-link" href="index.html">Home</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="index.html">Scan</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="results.html">Results</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="index.html">Contact</a>
+						</li>
+					</ul>
+				</div>
+				
+			</div>
+
+		</div>
+	</nav>
+	<!-- Close Header -->
+
+	<!-- START here for Content-->
+	<div class="findings">
+		<div class="results row">
+			<div class="col-md-8">
+			  <h1 id="result_head">Secret Scanning Result</h1>
+			</div>
+			<div  class="col-md-4">
+			  	<form id="download" action="{{ url_for('download', file=report_name)}}" method="post">
+				  <button type="submit" class="btn btn-primary btn-block btn-large">
+					Download Report CSV
+				  </button>
+				</form>
+			</div>
+		</div>
+
+		<div class="list_find">
+			<div class="row">
+			  <div class="col-md-10"><h4>Findings:</h4></div>
+			  <div class="col-md-2"></div>
+			</div>
+			{% for key, value in scan_results.items() %}
+			{% if value %}
+			<!-- ADD ACCORDION HERE-->
+			<div class="accordion-item" id="acc{{ value.0.key_id }}">
+			  <!-- Accordion Head -->
+			  <h2 class="accordion-header" id="accordionhead{{ value.0.key_id }}">
+				<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accordion{{ value.0.key_id }}" aria-expanded="true" aria-controls="accordion{{ value.0.key_id }}">
+				  URL: {{ key }}
+				</button>
+			  </h2>
+			  <!-- Table/Accordion content Starts here -->
+			  <div id="accordion{{ value.0.key_id }}" class="accordion-collapse collapse" aria-labelledby="accordionhead{{ value.0.key_id }}" data-bs-parent="#acc{{ value.0.key_id }}">
+				<div class="accordion-body">
+				  <div class="row">
+					<div class="col-md-10"></div>
+					<div class="col-md-2">
+					  <!-- Expand/Collapse all buttons-->
+					  <div style="text-align: right;"><a data-bs-toggle="collapse" href=".collapseExample">Expand/Collapse All</a></div>
+					</div>
+				  </div>
+				  <table class="table table-bordered table-light table-striped">
+				  <!-- Table Heading -->
+				  <thead>
+					<tr>
+					<th class="col-6">Path</th>
+					<th class="col-5">Reason</th>
+					<th class="col-1">Toggle</th>
+					</tr>
+				  </thead>
+				  <tbody>
+					{% for v in value %}
+					<!-- Identifier -->
+					<tr>
+					<td style="vertical-align: middle;">{{ v.path }}</td>
+					<td style="vertical-align: middle;">{{ v.reason }}</td>
+					<td style="text-align: center;"><a data-bs-toggle="collapse" href="#collapse{{ v.key_id }}">More...</a></td>
+					</tr>
+					<tr>
+					<!-- Collapsed item -->
+					<td colspan="3" class="collapse collapseExample" id="collapse{{ v.key_id }}">
+					  <h5><b>URL:</b></h5>
+					  <p><a href="{{ key }}">{{ key }}</a></p>
+					  <h5><b>Branch:</b></h5>
+					  <p>{{ v.branch }}</p>
+					  <h5><b>Commit:</b></h5>
+					  <p>{{ v.commit }}</p>
+					  <h5><b>Commit Hash:</b></h5>
+					  <p>{{ v.commitHash }}</p>
+					  <h5><b>Date:</b></h5>
+					  <p>{{ v.date }}</p>
+					  <h5><b>Print Diff:</b></h5>
+					  <p>{{ v.printDiff }}</p>
+					  <h5><b>Strings Found:</b></h5>
+					  <p>{{ v.stringsFound }}</p>
+					</td>
+					</tr>
+					{% endfor %}
+				  </tbody>
+				  </table>
+				</div>
+			  </div>
+			  <!-- Table Ends here -->
+			</div>
+			{% endif %}
+			{% endfor %}
+			<!-- END ACCORDION HERE -->
+		</div>
+	</div>
+	<!-- End Here Content-->
+
+	<!-- Start Footer -->
+	<footer class="bg-dark" id="tempaltemo_footer">
+		<div class="container">
+			<div class="row">
+
+				<div class="col-md-4 pt-5">
+					<h2 class="h2 text-success border-bottom pb-3 border-light logo">KPMG</h2>
+					<ul class="list-unstyled text-light footer-link-list">
+						<li>
+							<i class="fas fa-map-marker-alt fa-fw"></i>
+							123 KPMG 12345
+						</li>
+						<li>
+							<i class="fa fa-phone fa-fw"></i>
+							<a class="text-decoration-none" href="tel:123-456-7890">123-456-7890</a>
+						</li>
+						<li>
+							<i class="fa fa-envelope fa-fw"></i>
+							<a class="text-decoration-none" href="mailto:secretscanner@kpmg.com">secretscanner@kpmg.com</a>
+						</li>
+					</ul>
+				</div>
+
+				<div class="col-md-4 pt-5">
+					<h2 class="h2 text-light border-bottom pb-3 border-light">Products</h2>
+					<ul class="list-unstyled text-light footer-link-list">
+						<li><a class="text-decoration-none" href="#">TruffleHog</a></li>
+						<li><a class="text-decoration-none" href="#">RustyHog</a></li>
+
+					</ul>
+				</div>
+
+				<div class="col-md-4 pt-5">
+					<h2 class="h2 text-light border-bottom pb-3 border-light">Further Info</h2>
+					<ul class="list-unstyled text-light footer-link-list">
+						<li><a class="text-decoration-none" href="#">Home</a></li>
+						<li><a class="text-decoration-none" href="#">Scan</a></li>
+						<li><a class="text-decoration-none" href="#">Results</a></li>
+						<li><a class="text-decoration-none" href="#">FAQs</a></li>
+						<li><a class="text-decoration-none" href="#">Contact</a></li>
+					</ul>
+				</div>
+
+			</div>
+
+			<div class="row text-light mb-4">
+				<div class="col-12 mb-3">
+					<div class="w-100 my-3 border-top border-light"></div>
+				</div>
+				<div class="col-auto me-auto">
+					<ul class="list-inline text-left footer-icons">
+						<li class="list-inline-item border border-light rounded-circle text-center">
+							<a class="text-light text-decoration-none" target="_blank" href="http://facebook.com/"><i class="fab fa-facebook-f fa-lg fa-fw"></i></a>
+						</li>
+						<li class="list-inline-item border border-light rounded-circle text-center">
+							<a class="text-light text-decoration-none" target="_blank" href="https://www.instagram.com/"><i class="fab fa-instagram fa-lg fa-fw"></i></a>
+						</li>
+						<li class="list-inline-item border border-light rounded-circle text-center">
+							<a class="text-light text-decoration-none" target="_blank" href="https://twitter.com/"><i class="fab fa-twitter fa-lg fa-fw"></i></a>
+						</li>
+						<li class="list-inline-item border border-light rounded-circle text-center">
+							<a class="text-light text-decoration-none" target="_blank" href="https://www.linkedin.com/"><i class="fab fa-linkedin fa-lg fa-fw"></i></a>
+						</li>
+					</ul>
+				</div>
+				<div class="col-auto">
+					<label class="sr-only" for="subscribeEmail">Email address</label>
+					<div class="input-group mb-2">
+						<input type="text" class="form-control bg-dark border-light" id="subscribeEmail" placeholder="Email address">
+						<div class="input-group-text btn-success text-light">Subscribe</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="w-100 bg-black py-3">
+			<div class="container">
+				<div class="row pt-2">
+					<div class="col-12">
+						<p class="text-left text-light">
+							Copyright &copy; 2021 KPMG 
+				
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</footer>
+	<!-- End Footer -->
+
+	<script src="{{url_for('static', filename='assets/js/jquery-1.11.0.min.js')}}"></script>
+	<script src="{{url_for('static', filename='assets/js/jquery-migrate-1.2.1.min.js')}}"></script>
+	<script src="{{url_for('static', filename='assets/js/bootstrap.bundle.min.js')}}"></script>
+	<script src="{{url_for('static', filename='assets/js/templatemo.js')}}"></script>
+</body>
+</html>

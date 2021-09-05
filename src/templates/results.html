@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Deployable Secrets Scanner</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='/assets/css/fontawesome.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/templatemo.css') }}">
+
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand text-success logo h1 align-self-center" href="index.html">
+                <img src="{{url_for('static', filename='assets/img/kpmg_logo.jpg')}}"  />
+            </a>
+
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
+                <div class="flex-fill">
+                    <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Scan</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="results.html">Results</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+        </div>
+    </nav>
+    <!-- Close Header -->
+
+  <!--
+    Title - Download 
+    Urls scanned
+      How
+    Urls skipped
+      How
+    Findings
+    URL and Branch
+      Commit
+      Commit Hash
+      Date Path
+      Print Diff
+  -->
+
+  <!--Title Area-->
+	<div class="bg-light">
+		<div class="results row">
+      <div class="col-md-8">
+        <h1 id="result_head">Secret Scanning Results</h1>
+      </div>
+			<div  class="col-md-4">
+        <form id="download" action="{{ url_for('download', file=report_name)}}" method="post">
+            <button type="submit" class="btn btn-primary btn-block btn-large">
+              Download Report CSV
+            </button>
+        </form>
+      </div>
+    </div>
+    <!--End Title Area-->
+
+    <!-- Findings -->
+    <div class="findings">
+
+      <div>
+        <h4>URLs Scanned:</h4><br/>
+        <table class="table table-bordered table-light">
+          <tbody>
+          {% for url in scanned_urls %}
+            <tr>
+              <td><a href="#">{{ url }}</a></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h4>URLs Skipped:</h4><br/>
+        <table class="table table-bordered table-light">
+          <tbody>
+          {% for url in skipped_urls %}
+            <tr>
+              <td><a href="#">{{ url }}</a></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="list_find">
+        <div class="row">
+          <div class="col-md-10"><h4>Findings:</h4></div>
+          <div class="col-md-2"></div>
+        </div>
+        {% for key, value in scan_results.items() %}
+        {% if value %}
+        <!-- ADD ACCORDION HERE-->
+        <div class="accordion-item" id="acc{{ value.0.key_id }}">
+          <!-- Accordion Head -->
+          <h2 class="accordion-header" id="accordionhead{{ value.0.key_id }}">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accordion{{ value.0.key_id }}" aria-expanded="true" aria-controls="accordion{{ value.0.key_id }}">
+              URL: {{ key }}
+            </button>
+          </h2>
+          <!-- Table/Accordion content Starts here -->
+          <div id="accordion{{ value.0.key_id }}" class="accordion-collapse collapse" aria-labelledby="accordionhead{{ value.0.key_id }}" data-bs-parent="#acc{{ value.0.key_id }}">
+            <div class="accordion-body">
+              <div class="row">
+                <div class="col-md-10"></div>
+                <div class="col-md-2">
+                  <!-- Expand/Collapse all buttons-->
+                  <div style="text-align: right;"><a data-bs-toggle="collapse" href=".collapseExample">Expand/Collapse All</a></div>
+                </div>
+              </div>
+              <table class="table table-bordered table-light table-striped">
+              <!-- Table Heading -->
+              <thead>
+                <tr>
+                <th class="col-6">Path</th>
+                <th class="col-5">Reason</th>
+                <th class="col-1">Toggle</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for v in value %}
+                <!-- Identifier -->
+                <tr>
+                <td style="vertical-align: middle;">{{ v.path }}</td>
+                <td style="vertical-align: middle;">{{ v.reason }}</td>
+                <td style="text-align: center;"><a data-bs-toggle="collapse" href="#collapse{{ v.key_id }}">More...</a></td>
+                </tr>
+                <tr>
+                <!-- Collapsed item -->
+                <td colspan="3" class="collapse collapseExample" id="collapse{{ v.key_id }}">
+                  <h5><b>URL:</b></h5>
+                  <p><a href="{{ key }}">{{ key }}</a></p>
+                  <h5><b>Branch:</b></h5>
+                  <p>{{ v.branch }}</p>
+                  <h5><b>Commit:</b></h5>
+                  <p>{{ v.commit }}</p>
+                  <h5><b>Commit Hash:</b></h5>
+                  <p>{{ v.commitHash }}</p>
+                  <h5><b>Date:</b></h5>
+                  <p>{{ v.date }}</p>
+                  <h5><b>Print Diff:</b></h5>
+                  <p>{{ v.printDiff }}</p>
+                  <h5><b>Strings Found:</b></h5>
+                  <p>{{ v.stringsFound }}</p>
+                </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Table Ends here -->
+        </div>
+        {% endif %}
+        {% endfor %}
+        <!-- END ACCORDION HERE -->
+      </div>
+    </div>
+
+    <!-- Scripts below -->
+    <button onclick="update('var1')">Variable 1</button>
+    <button onclick="update('var2')">Variable 2</button>
+    <div id="my_dataviz"></div>
+		
+    <script src="{{url_for('static', filename='assets/js/jquery-1.11.0.min.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/jquery-migrate-1.2.1.min.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/templatemo.js')}}"></script>
+    <script>
+      // set the dimensions and margins of the graph
+      var margin = {top: 30, right: 30, bottom: 70, left: 60},
+      width = 460 - margin.left - margin.right,
+      height = 400 - margin.top - margin.bottom;
+
+      // append the svg object to the body of the page
+      var svg = d3.select("#my_dataviz")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+      // Initialize the X axis
+      var x = d3.scaleBand()
+        .range([ 0, width ])
+        .padding(0.2);
+      var xAxis = svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+
+      // Initialize the Y axis
+      var y = d3.scaleLinear()
+        .range([ height, 0]);
+      var yAxis = svg.append("g")
+        .attr("class", "myYaxis")
+
+
+      // A function that create / update the plot for a given variable:
+      function update(selectedVar) {
+        // Parse the Data
+        d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/barplot_change_data.csv", function(data) {
+          // X axis
+          x.domain(data.map(function(d) { return d.group; }))
+          xAxis.transition().duration(1000).call(d3.axisBottom(x))
+
+          // Add Y axis
+          y.domain([0, d3.max(data, function(d) { return +d[selectedVar] }) ]);
+          yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+          // variable u: map data to existing bars
+          var u = svg.selectAll("rect")
+            .data(data)
+
+          // update bars
+            u
+              .enter()
+              .append("rect")
+              .merge(u)
+              .transition()
+              .duration(1000)
+                .attr("x", function(d) { return x(d.group); })
+                .attr("y", function(d) { return y(d[selectedVar]); })
+                .attr("width", x.bandwidth())
+                .attr("height", function(d) { return height - y(d[selectedVar]); })
+                .attr("fill", "#69b3a2")
+        })
+
+      }
+      // Initialize plot
+      update('var1')
+    </script>
+
+		</div>
+	</div>
+</body>
+</html>
