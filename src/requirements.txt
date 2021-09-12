@@ -1,0 +1,9 @@
+Flask
+Flask-Table
+gunicorn
+requests
+threadpoolctl
+GitPython
+truffleHog
+truffleHogRegexes
+urllib3
