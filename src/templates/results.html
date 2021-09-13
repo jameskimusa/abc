@@ -2,58 +2,31 @@
 <html>
 
 <head>
-  <meta charset="UTF-8">
-  <title>Deployable Secrets Scanner</title>
-  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
-  <link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
-  <link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
-  <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
-
+	<meta charset="UTF-8">
+	<title>Deployable Secrets Scanner</title>
+	<link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.min.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='/assets/css/fontawesome.min.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='/assets/css/fontawesome.min.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/templatemo.css') }}">
-
-  <script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="{{url_for('static', filename='assets/js/jquery-3.6.0.min.js')}}"></script>
+	<script src="{{url_for('static', filename='assets/js/bootstrap.bundle.min.js')}}"></script>
+	<script src="{{url_for('static', filename='assets/js/templatemo.js')}}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
 </head>
 
 <body>
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand text-success logo h1 align-self-center" href="index.html">
-                <img src="{{url_for('static', filename='assets/img/kpmg_logo.jpg')}}"  />
-            </a>
-
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
-                <div class="flex-fill">
-                    <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">Scan</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="results.html">Results</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.html">Contact</a>
-                        </li>
-                    </ul>
-                </div>
-                
-            </div>
-        </div>
-    </nav>
-    <!-- Close Header -->
-
-  <!--
+	<!-- Header -->
+	<nav class="navbar navbar-expand-lg navbar-light">
+		<div class="container d-flex justify-content-between align-items-center">
+			<a class="navbar-brand text-success logo h1 align-self-center" href="index.html"> <img src="{{url_for('static', filename='assets/img/kpmg_logo.jpg')}}" /> </a>
+		</div>
+	</nav>
+	<!-- Close Header -->
+	<!--
     Title - Download 
     Urls scanned
       How
@@ -66,230 +39,221 @@
       Date Path
       Print Diff
   -->
-
-  <!--Title Area-->
+	<!--Title Area-->
 	<div class="bg-light">
 		<div class="results row">
-      <div  class="col-md-2"></div>
-      <div class="col-md-8">
-        <h1 id="result_head">Secret Scanning Results</h1>
-      </div>
-			<div  class="col-md-2">
-        <form id="download" action="{{ url_for('download', file=report_name)}}" method="post">
-            <button type="submit" class="btn btn-primary btn-block btn-large" style="font-size: small">
-              Download Report CSV
-            </button>
-        </form>
-      </div>
-    </div>
-    <!--End Title Area-->
+			<div class="col-md-2"></div>
+			<div class="col-md-8">
+				<h1 id="result_head">Secret Scanning Results</h1> </div>
+			<div class="col-md-2">
+				<form id="download" action="{{ url_for('download', file=report_name)}}" method="post">
+					<button type="submit" class="btn btn-primary btn-block btn-large" style="font-size: small"> Download Report CSV </button>
+				</form>
+			</div>
+		</div>
+		<!--End Title Area-->
 
-    <!-- Findings -->
-    <div class="findings">
+		<div class="charts"
+			<div class="container-fluid">
+				<div class="row content">
+					<h4>Analytics Dashboards</h4>
+					<div class="col-sm-12 col-md-12 col-lg-12" id="contemt-main">
+						<div class="row justify-content-center">
 
-      <div>
-        <h4>URLs</h4>
-        <div class="accordion-item">
-          <!-- URLs scanned -->
-          <h2 class="accordion-header" id="heading_scan">
+							<div class="col-sm-4 col-md-4 col-lg-3 mb-5" style="border-style: solid; border-width:2px; border-color: #FFFFFF; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+								<h5> Total Findings: </h5>
+									<h3 style="font-size:120px; left: 50%">{{count}}</h3>
+							</div>
+
+							<div class="col-sm-4 col-md-4 col-lg-3 mb-5" style="border-style: solid; border-width:2px; border-color: #FFFFFF; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+								<h5> Findings by Category </h5>
+								<canvas id="myChart" width="300" height="300"></canvas>  
+							</div>
+
+							<div class="col-sm-4 col-md-4 col-lg-3 mb-5" style="border-style: solid; border-width:2px; border-color: #FFFFFF; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+								<h5> Secret Findings by Category </h5>
+								<canvas id="pie-chart" width="300" height="300"></canvas>  
+							</div>
+
+							
+
+						</div>
+					</div>	
+				</div>
+
+		
+
+
+
+		<!-- Findings -->
+		<div class="findings">
+			<div>
+				<h4>URLs</h4>
+				<div class="accordion-item">
+					<!-- URLs scanned -->
+					<h2 class="accordion-header" id="heading_scan">
             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#scanned_collapse" aria-expanded="true" aria-controls="scanned_collapse">
               URLs Scanned
             </button>
           </h2>
-          <div id="scanned_collapse" class="accordion-collapse collapse show" aria-labelledby="heading_scan">
-            <div class="accordion-body">
-              {% if not scanned_urls %}
-                None
-              {% else %}
-              <table class="table table-bordered table-light">
-                <tbody>
-                {% for url in scanned_urls %}
-                  <tr>
-                    <td><a href="#">{{ url }}</a></td>
-                  </tr>
-                {% endfor %}
-                </tbody>
-              </table>  
-              {% endif %}           
-            </div>
-          </div>
-          <!-- URLs Skipped -->
-          <h2 class="accordion-header" id="heading_skip">
+					<div id="scanned_collapse" class="accordion-collapse collapse show" aria-labelledby="heading_scan">
+						<div class="accordion-body"> {% if not scanned_urls %} None {% else %}
+							<table class="table table-bordered table-light">
+								<tbody> {% for url in scanned_urls %}
+									<tr>
+										<td><a href="#">{{ url }}</a></td>
+									</tr> {% endfor %} </tbody>
+							</table> {% endif %} </div>
+					</div>
+					<!-- URLs Skipped -->
+					<h2 class="accordion-header" id="heading_skip">
             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#skipped_collapse" aria-expanded="false" aria-controls="skipped_collapse">
               URLs Skipped
             </button>
           </h2>
-          <div id="skipped_collapse" class="accordion-collapse collapse" aria-labelledby="heading_skip">
-            <div class="accordion-body">
-              {% if not skipped_urls %}
-                None
-              {% else %}
-                <table class="table table-bordered table-light">
-                
-                <tbody>
-                {% for url in skipped_urls %}
-                  <tr>
-                    <td><a href="#">{{ url }}</a></td>
-                  </tr>
-                {% endfor %}
-                </tbody>
-                
-                </table>  
-              {% endif %}        
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <br/>
-
-      <div class="list_find">
-        <div class="row">
-          <div class="col-md-10"><h4>Found in:</h4></div>
-          <div class="col-md-2"></div>
-        </div>
-        {% for key, value in scan_results.items() %}
-        {% if value %}
-        <!-- ADD ACCORDION HERE-->
-        <div class="accordion-item" id="acc{{ value.0.key_id }}">
-          <!-- Accordion Head -->
-          <h2 class="accordion-header" id="accordionhead{{ value.0.key_id }}">
+					<div id="skipped_collapse" class="accordion-collapse collapse" aria-labelledby="heading_skip">
+						<div class="accordion-body"> {% if not skipped_urls %} None {% else %}
+							<table class="table table-bordered table-light">
+								<tbody> {% for url in skipped_urls %}
+									<tr>
+										<td><a href="#">{{ url }}</a></td>
+									</tr> {% endfor %} </tbody>
+							</table> {% endif %} </div>
+					</div>
+				</div>
+			</div>
+			<br/>
+			<div class="list_find">
+				<div class="row">
+					<div class="col-md-10">
+						<h4>Found in:</h4></div>
+					<div class="col-md-2"></div>
+				</div> {% for key, value in scan_results.items() %} {% if value %}
+				<!-- ADD ACCORDION HERE-->
+				<div class="accordion-item" id="acc{{ value.0.key_id }}">
+					<!-- Accordion Head -->
+					<h2 class="accordion-header" id="accordionhead{{ value.0.key_id }}">
             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accordion{{ value.0.key_id }}" aria-expanded="true" aria-controls="accordion{{ value.0.key_id }}">
               {{ key }}
             </button>
           </h2>
-          <!-- Table/Accordion content Starts here -->
-          <div id="accordion{{ value.0.key_id }}" class="accordion-collapse collapse" aria-labelledby="accordionhead{{ value.0.key_id }}" data-bs-parent="#acc{{ value.0.key_id }}">
-            <div class="accordion-body">
-              <div class="row">
-                <div class="col-md-10"></div>
-                <div class="col-md-2">
-                  <!-- Expand/Collapse all buttons-->
-                  <div style="text-align: right;"><a data-bs-toggle="collapse" href=".collapseExample">Expand/Collapse All</a></div>
-                </div>
-              </div>
-              <table class="table table-bordered table-light table-striped">
-              <!-- Table Heading -->
-              <thead>
-                <tr>
-                <th class="col-6">Path</th>
-                <th class="col-5">Reason</th>
-                <th class="col-1">Toggle</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for v in value %}
-                <!-- Identifier -->
-                <tr>
-                <td style="vertical-align: middle;">{{ v.path }}</td>
-                <td style="vertical-align: middle;">{{ v.reason }}</td>
-                <td style="text-align: center;"><a data-bs-toggle="collapse" href="#collapse{{ v.key_id }}">More...</a></td>
-                </tr>
-                <tr>
-                <!-- Collapsed item -->
-                <td colspan="3" class="collapse collapseExample" id="collapse{{ v.key_id }}">
-                  <h5><b>URL:</b></h5>
-                  <p><a href="{{ key }}">{{ key }}</a></p>
-                  <h5><b>Branch:</b></h5>
-                  <p>{{ v.branch }}</p>
-                  <h5><b>Commit:</b></h5>
-                  <p>{{ v.commit }}</p>
-                  <h5><b>Commit Hash:</b></h5>
-                  <p>{{ v.commitHash }}</p>
-                  <h5><b>Date:</b></h5>
-                  <p>{{ v.date }}</p>
-                  <h5><b>Print Diff:</b></h5>
-                  <p>{{ v.printDiff }}</p>
-                  <h5><b>Strings Found:</b></h5>
-                  <p>{{ v.stringsFound }}</p>
-                </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-              </table>
-            </div>
-          </div>
-          <!-- Table Ends here -->
-        </div>
-        {% endif %}
-        {% endfor %}
-        <!-- END ACCORDION HERE -->
-      </div>
-    </div>
-
-    <!-- Scripts below -->
-    <button onclick="update('var1')">Variable 1</button>
-    <button onclick="update('var2')">Variable 2</button>
-    <div id="my_dataviz"></div>
-		
-    <script src="{{url_for('static', filename='assets/js/jquery-3.6.0.min.js')}}"></script>
-    <script src="{{url_for('static', filename='assets/js/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{url_for('static', filename='assets/js/templatemo.js')}}"></script>
-    <script>
-      // set the dimensions and margins of the graph
-      var margin = {top: 30, right: 30, bottom: 70, left: 60},
-      width = 460 - margin.left - margin.right,
-      height = 400 - margin.top - margin.bottom;
-
-      // append the svg object to the body of the page
-      var svg = d3.select("#my_dataviz")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
-
-      // Initialize the X axis
-      var x = d3.scaleBand()
-        .range([ 0, width ])
-        .padding(0.2);
-      var xAxis = svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-
-      // Initialize the Y axis
-      var y = d3.scaleLinear()
-        .range([ height, 0]);
-      var yAxis = svg.append("g")
-        .attr("class", "myYaxis")
-
-
-      // A function that create / update the plot for a given variable:
-      function update(selectedVar) {
-        // Parse the Data
-        d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/barplot_change_data.csv", function(data) {
-          // X axis
-          x.domain(data.map(function(d) { return d.group; }))
-          xAxis.transition().duration(1000).call(d3.axisBottom(x))
-
-          // Add Y axis
-          y.domain([0, d3.max(data, function(d) { return +d[selectedVar] }) ]);
-          yAxis.transition().duration(1000).call(d3.axisLeft(y));
-
-          // variable u: map data to existing bars
-          var u = svg.selectAll("rect")
-            .data(data)
-
-          // update bars
-            u
-              .enter()
-              .append("rect")
-              .merge(u)
-              .transition()
-              .duration(1000)
-                .attr("x", function(d) { return x(d.group); })
-                .attr("y", function(d) { return y(d[selectedVar]); })
-                .attr("width", x.bandwidth())
-                .attr("height", function(d) { return height - y(d[selectedVar]); })
-                .attr("fill", "#69b3a2")
-        })
-
-      }
-      // Initialize plot
-      update('var1')
-    </script>
-
+					<!-- Table/Accordion content Starts here -->
+					<div id="accordion{{ value.0.key_id }}" class="accordion-collapse collapse" aria-labelledby="accordionhead{{ value.0.key_id }}" data-bs-parent="#acc{{ value.0.key_id }}">
+						<div class="accordion-body">
+							<div class="row">
+								<div class="col-md-10"></div>
+								<div class="col-md-2">
+									<!-- Expand/Collapse all buttons-->
+									<div style="text-align: right;"><a data-bs-toggle="collapse" href=".collapseExample">Expand/Collapse All</a></div>
+								</div>
+							</div>
+							<table class="table table-bordered table-light table-striped">
+								<!-- Table Heading -->
+								<thead>
+									<tr>
+										<th class="col-6">Path</th>
+										<th class="col-5">Reason</th>
+										<th class="col-1">Toggle</th>
+									</tr>
+								</thead>
+								<tbody> {% for v in value %}
+									<!-- Identifier -->
+									<tr>
+										<td style="vertical-align: middle;">{{ v.path }}</td>
+										<td style="vertical-align: middle;">{{ v.reason }}</td>
+										<td style="text-align: center;"><a data-bs-toggle="collapse" href="#collapse{{ v.key_id }}">More...</a></td>
+									</tr>
+									<tr>
+										<!-- Collapsed item -->
+										<td colspan="3" class="collapse collapseExample" id="collapse{{ v.key_id }}">
+											<h5><b>URL:</b></h5>
+											<p><a href="{{ key }}">{{ key }}</a></p>
+											<h5><b>Branch:</b></h5>
+											<p>{{ v.branch }}</p>
+											<h5><b>Commit:</b></h5>
+											<p>{{ v.commit }}</p>
+											<h5><b>Commit Hash:</b></h5>
+											<p>{{ v.commitHash }}</p>
+											<h5><b>Date:</b></h5>
+											<p>{{ v.date }}</p>
+											<h5><b>Print Diff:</b></h5>
+											<p>{{ v.printDiff }}</p>
+											<h5><b>Strings Found:</b></h5>
+											<p>{{ v.stringsFound }}</p>
+										</td>
+									</tr> {% endfor %} </tbody>
+							</table>
+						</div>
+					</div>
+					<!-- Table Ends here -->
+				</div> {% endif %} {% endfor %}
+				<!-- END ACCORDION HERE -->
+			</div>
 		</div>
 	</div>
+	</div>
+	<!-- Scripts below -->
+	<!-- Bar Graph START-->
+
+	<script>
+	var myBarChart= new Chart(document.getElementById("myChart"), {
+    type: 'bar',
+    data: {
+      labels: ['Generic Secret', 'RSA private key', 'SSH (OPENSSH) private key', 'SSH (DSA) private key', 'SSH (EC) private key', 'PGP private key block'],
+      datasets: [{
+        label: "Category",
+		backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 99, 132, 0.3)'],
+		borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 99, 132, 2)'],
+		borderWidth: 1,
+        data: {{data}}
+      }]
+    },
+	options: {
+		title: {
+			display: true,
+			text: "Secrets Findings by Category"
+		},
+		scales: {
+			y: {
+				beginAtZero: true
+			}
+		}
+	}
+});
+
+
+	</script>
+
+
+
+
+
+
+	<script>
+
+var myPieChart= new Chart(document.getElementById("pie-chart"), {
+    type: 'doughnut',
+    data: {
+      labels: ['Generic Secret', 'RSA private key', 'SSH (OPENSSH) private key', 'SSH (DSA) private key', 'SSH (EC) private key', 'PGP private key block'],
+      datasets: [{
+        label: "Category",
+        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850", "#92a8d1"],
+        data: {{data}}
+      }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Findings by Category'
+      }
+    }
+});
+
+
+
+
+	</script>
+	<!-- Bar Graph END -->
 </body>
+
 </html>

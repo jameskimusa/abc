@@ -268,6 +268,46 @@ def email_report(report_recipients, report_name):
     # Convert the message to a string and send it
     smtp_obj.sendmail(msg['From'], msg['To'], msg.as_string())
     smtp_obj.quit()
+
+##Parsing Data for Bar Graph
+
+def toChartList(found_secrets):
+    data = []
+    total_count = 0
+    genericSecret_cnt = 0
+    RSAprivatekey_cnt = 0
+    sSHOpenSSH_cnt = 0
+    sSHDSA_cnt = 0
+    sSHEC_cnt = 0
+    PGP_cnt = 0
+    for value in found_secrets.values():
+        for reason in value:
+
+            if str(reason['reason']) == 'Generic Secret':
+                genericSecret_cnt +=1
+            if str(reason['reason']) == 'RSA private key':
+                RSAprivatekey_cnt +=1                
+            if str(reason['reason']) == 'SSH (OPENSSH) private key':
+                sSHOpenSSH_cnt +=1
+            if str(reason['reason']) == 'SSH (DSA) private key':
+                sSHDSA_cnt +=1        
+            if str(reason['reason']) == 'SSH (EC) private key':
+                sSHEC_cnt +=1
+            if str(reason['reason']) == 'PGP private key block':
+                PGP_cnt +=1                
+
+    data.append(genericSecret_cnt)
+    data.append(RSAprivatekey_cnt)
+    data.append(sSHOpenSSH_cnt)
+    data.append(sSHDSA_cnt)
+    data.append(sSHEC_cnt)
+    data.append(PGP_cnt)
+    total_count = genericSecret_cnt + RSAprivatekey_cnt + sSHOpenSSH_cnt + sSHDSA_cnt + sSHEC_cnt + PGP_cnt
+
+    return data, total_count
+
+
+
 @app.route('/')
 def home():
     read_config()
@@ -342,7 +382,7 @@ def scan():
                     skipped.append(repo)
                     continue
                 
-            '''
+            
             # Comment this out for faster running for developmental purpose
             file = open(file_name, "w")
             cmd = "trufflehog --json --regex --entropy=" + str(entropy) + " " + repo_pass 
@@ -351,7 +391,7 @@ def scan():
             file.flush()
             file.close()
             # Comment up to here
-            '''
+            
 
             file = open(file_name, "r")
             
@@ -392,9 +432,14 @@ def scan():
 
     if report_recipients:
         email_report(report_recipients, report_name)
+    
+    #Parsing data for Bar Chart
+    data = []
+    count = 0
+    data, count = toChartList(found_secrets)
 
     #return render_template('results.html', scan_results=f'{table_html}', scanned_urls=f'{scanned_urls_html}',  skipped_urls=f'{skipped_urls_html}', report_name=f'{report_name}')
-    return render_template('results.html', scan_results=found_secrets, scanned_urls=scanned,  skipped_urls=skipped, report_name=f'{report_name}')
+    return render_template('results.html', data=data, count=count, scan_results=found_secrets, scanned_urls=scanned,  skipped_urls=skipped, report_name=f'{report_name}')
 
 @app.route('/previous_results',methods=['GET', 'POST'])
 def previous_results():
